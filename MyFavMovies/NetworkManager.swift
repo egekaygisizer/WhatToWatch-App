@@ -124,6 +124,18 @@ final class NetworkManager {
             }
         }
     }
+    
+    func fetchAllTimeSeries(completed: @escaping (Result<[AllTimeSeries], NetworkError>) -> Void) {
+        let urlString = "\(baseURL)/tv/top_rated?api_key=\(NetworkManager.apiKey)&page=1"
+        performRequest(urlString: urlString, decodingType: AllTimeSeriesResponse.self) { result in
+            switch result {
+            case .success(let response):
+                completed(.success(response.results))
+            case .failure(let error):
+                completed(.failure(error))
+            }
+        }
+    }
 }
 
 

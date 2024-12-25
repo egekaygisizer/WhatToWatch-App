@@ -22,7 +22,7 @@ struct ContentViewListCell: View {
                     .frame(width: 120, height: 180)
                     .cornerRadius(10)
             } placeholder: {
-                Image(notLoadImage)
+                Image(systemName: "photo.on.rectangle.angled")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 120, height: 180)

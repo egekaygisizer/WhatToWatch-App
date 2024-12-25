@@ -11,6 +11,7 @@ final class SeriesViewModel: ObservableObject {
     
     @Published var topSeries: [TopSeries] = []
     @Published var discoverSeries: [DiscoverSeries] = []
+    @Published var allTimeSeries: [AllTimeSeries] = []
 
     
     // Get Top Series
@@ -23,6 +24,12 @@ final class SeriesViewModel: ObservableObject {
     func getDiscoverSeries() {
         NetworkManager.shared.getNetworkCall(fetchFunction: NetworkManager.shared.fetchDiscoverSeries) { discoverSeries in
             self.discoverSeries = discoverSeries
+        }
+    }
+    
+    func getAllTimeSeries() {
+        NetworkManager.shared.getNetworkCall(fetchFunction: NetworkManager.shared.fetchAllTimeSeries) { allTimeSeries in
+            self.allTimeSeries = allTimeSeries
         }
     }
 

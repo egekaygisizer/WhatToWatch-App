@@ -18,7 +18,7 @@ protocol Movie {
     var vote_count: Int { get }
 }
 
-struct TopMovies : Decodable, Identifiable {
+struct TopMovies : Decodable, Identifiable, Movie {
     let id: Int
     let title: String
     let overview: String
@@ -33,7 +33,7 @@ struct TopMoviesResponse: Decodable {
     let results: [TopMovies]
 }
 
-struct DiscoverMovies : Decodable, Identifiable {
+struct DiscoverMovies : Decodable, Identifiable, Movie {
     let id: Int
     let title: String
     let overview: String
@@ -48,7 +48,7 @@ struct DiscoverMoviesResponse : Decodable {
     let results: [DiscoverMovies]
 }
 
-struct AllTimeMovies: Decodable, Identifiable {
+struct AllTimeMovies: Decodable, Identifiable, Movie {
     let id: Int
     let title: String
     let overview: String

@@ -14,7 +14,7 @@ struct SeriesView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                CategoryTitle(category: "Top 5 Series!")
+                CategoryTitle(category: "Top 5 Series Today!")
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(viewModel.topSeries) { series in
@@ -33,12 +33,24 @@ struct SeriesView: View {
                         }
                     }
                 }
+                
+                CategoryTitle(category: "All Time Series!")
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(viewModel.allTimeSeries) { series in
+                            ContentViewListCell(imageURL: "https://image.tmdb.org/t/p/w500\(series.poster_path ?? "")", notLoadImage: "examplePoster", movieTitle: "\(series.name)")
+                            
+                        }
+                    }
+                }
+                
             }
             .navigationTitle("Series 🖥️")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 viewModel.getTopSeries()
                 viewModel.getDiscoverSeries()
+                viewModel.getAllTimeSeries()
             }
         }
     }

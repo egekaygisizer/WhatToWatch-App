@@ -17,7 +17,7 @@ struct MoviesView: View {
         NavigationView {
             ScrollView {
                 
-                CategoryTitle(category: "Top 5 Movies!")
+                CategoryTitle(category: "Top 5 Movies! Today")
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(viewModel.topMovies) { movie in
@@ -39,10 +39,15 @@ struct MoviesView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(viewModel.discoverMovies) { movie in
-                            ContentViewListCell(
-                                imageURL: "https://image.tmdb.org/t/p/w500\(movie.poster_path ?? "")",
-                                notLoadImage: "examplePoster",
-                                movieTitle: "\(movie.title)")
+                            NavigationLink(
+                                destination: MoviesDetailView(movie: movie)
+                            ) {
+                                ContentViewListCell(
+                                    imageURL: "https://image.tmdb.org/t/p/w500\(movie.poster_path ?? "")",
+                                    notLoadImage: "examplePoster",
+                                    movieTitle: "\(movie.title)")
+                            }
+                            .foregroundStyle(Color(.label))
                         }
                     }
                 }
@@ -51,10 +56,15 @@ struct MoviesView: View {
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(viewModel.allTimeMovies) { movie in
+                            NavigationLink(
+                                destination: MoviesDetailView(movie: movie)
+                            ) {
                                 ContentViewListCell(
                                     imageURL: "https://image.tmdb.org/t/p/w500\(movie.poster_path ?? "")",
                                     notLoadImage: "examplePoster",
                                     movieTitle: "\(movie.title)")
+                            }
+                            .foregroundStyle(Color(.label))
                         }
                     }
                 }
@@ -83,6 +93,7 @@ struct CategoryTitle: View {
         Text(category)
             .font(.title2)
             .bold()
+            .padding(.top, 10)
     }
 }
 
