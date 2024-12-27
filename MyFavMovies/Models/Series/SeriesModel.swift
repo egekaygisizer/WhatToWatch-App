@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol Series {
+protocol Series: Identifiable {
     var id: Int { get }
     var name: String { get }
     var overview: String { get }

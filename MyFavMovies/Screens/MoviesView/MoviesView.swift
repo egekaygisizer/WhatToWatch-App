@@ -10,8 +10,6 @@ import SwiftUI
 struct MoviesView: View {
     
     @StateObject var viewModel = MoviesViewModel()
-    @State var selectedMovie : TopMovies?
-    @State var isSelectedMovie: Bool = false
     
     var body: some View {
         NavigationView {

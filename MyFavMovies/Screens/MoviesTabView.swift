@@ -22,6 +22,7 @@ struct MoviesTabView: View {
                 FavoritesView()
             }
             
+            
         }
         .accentColor(Color("brandPrimary"))
         
