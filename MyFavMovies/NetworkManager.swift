@@ -15,6 +15,7 @@ final class NetworkManager {
     static let apiKey = "26057c9600d599f192bf24c0aea444a2"
     private let baseURL = "https://api.themoviedb.org/3"
     
+    
     private init () {}
     
     
@@ -51,19 +52,6 @@ final class NetworkManager {
         task.resume()
     }
     
-    
-    func fetchTopMovies(completed: @escaping (Result<[TopMovies], NetworkError>) -> Void) {
-        let urlString = "\(baseURL)/trending/movie/day?api_key=\(NetworkManager.apiKey)&page=1"
-        performRequest(urlString: urlString, decodingType: TopMoviesResponse.self) { result in
-            switch result {
-            case .success(let response):
-                completed(.success(response.results))
-            case .failure(let error):
-                completed(.failure(error))
-            }
-        }
-    }
-    
     func getNetworkCall<T>(fetchFunction: @escaping (@escaping (Result<T, NetworkError>) -> Void) -> Void, saveData: @escaping (T) -> Void) {
         fetchFunction { result in
             DispatchQueue.main.async {
@@ -73,6 +61,19 @@ final class NetworkManager {
                 case .failure(let error):
                     print("Failed to fetch data: \(error)")
                 }
+            }
+        }
+    }
+    
+    
+    func fetchTopMovies(completed: @escaping (Result<[TopMovies], NetworkError>) -> Void) {
+        let urlString = "\(baseURL)/trending/movie/day?api_key=\(NetworkManager.apiKey)&page=1"
+        performRequest(urlString: urlString, decodingType: TopMoviesResponse.self) { result in
+            switch result {
+            case .success(let response):
+                completed(.success(response.results))
+            case .failure(let error):
+                completed(.failure(error))
             }
         }
     }
@@ -131,6 +132,18 @@ final class NetworkManager {
             switch result {
             case .success(let response):
                 completed(.success(response.results))
+            case .failure(let error):
+                completed(.failure(error))
+            }
+        }
+    }
+    
+    func fetchSeriesDetails(seriesId: Int, completed: @escaping (Result<SeriesDetailModel, NetworkError>) -> Void) {
+        let urlString = "\(baseURL)/tv/\(seriesId)?api_key=\(NetworkManager.apiKey)"
+        performRequest(urlString: urlString, decodingType: SeriesDetailModel.self) { result in
+            switch result {
+            case .success(let response):
+                completed(.success(response))
             case .failure(let error):
                 completed(.failure(error))
             }
