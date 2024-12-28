@@ -8,24 +8,24 @@
 import SwiftUI
 
 struct FavoriteButton: View {
+    var isFavorite: Bool
+    var action: () -> Void = {}
     
     var body: some View {
-        Button {
-            
-        } label: {
-            Text("Add to Favorite")
-                .frame(width: 170,height: 50)
+        Button (action: action) {
+            Text(isFavorite ? "Remove from Favorite" : "Add to Favorite")
+                .frame(width: 190,height: 50)
                 .font(.title3)
                 .fontWeight(.medium)
-            Image(systemName: "star")
+            Image(systemName: isFavorite ? "star.fill" : "star")
                 .frame(width: 40)
                 .fontWeight(.semibold)
         }
         .buttonStyle(.bordered)
-        .tint(Color("brandPrimary"))
+        .tint(isFavorite ? .red : Color("brandPrimary"))
     }
 }
 
 #Preview {
-    FavoriteButton()
+    FavoriteButton(isFavorite: true)
 }

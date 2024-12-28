@@ -9,7 +9,7 @@ import Foundation
 
 final class SeriesDetailViewModel: ObservableObject {
     
-    @Published var seriesDetail : SeriesDetailModel!
+    @Published var seriesDetail : SeriesDetailModel?
     
     
     func getSeriesDetail(seriesId: Int) {

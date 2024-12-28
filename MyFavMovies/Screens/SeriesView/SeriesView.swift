@@ -10,6 +10,7 @@ import SwiftUI
 struct SeriesView: View {
     
     @StateObject var viewModel = SeriesViewModel()
+    @EnvironmentObject var favoriteSeries : FavoriteSeries
     
     var body: some View {
         NavigationView {

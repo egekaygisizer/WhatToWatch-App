@@ -10,6 +10,7 @@ import SwiftUI
 struct MoviesView: View {
     
     @StateObject var viewModel = MoviesViewModel()
+//    @EnvironmentObject var favoriteMovies : FavoriteMovies
     
     var body: some View {
         NavigationView {

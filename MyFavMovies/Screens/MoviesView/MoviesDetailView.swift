@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MoviesDetailView: View {
     let movie: any Movie
+    @EnvironmentObject var favoriteMovies : FavoriteMovies
     
     var body: some View {
         VStack(spacing: 20) {
@@ -24,8 +25,14 @@ struct MoviesDetailView: View {
                 // Movie overview, rating, release date
                 MovieDescription(movie: movie)
                 
-                FavoriteButton()
-                    .padding(.top, 50)
+                FavoriteButton(isFavorite: favoriteMovies.isFavorite(movie: movie)) {
+                    if favoriteMovies.isFavorite(movie: movie) {
+                        favoriteMovies.removeFromFavorites(movie: movie)
+                    } else {
+                        favoriteMovies.addToFavorites(movie: movie)
+                    }
+                }
+                    .padding(.top, 30)
             }
         }
     }

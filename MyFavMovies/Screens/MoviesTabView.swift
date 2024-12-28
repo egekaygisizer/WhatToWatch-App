@@ -7,23 +7,38 @@
 
 import SwiftUI
 
+class TabSelection: ObservableObject {
+    @Published var selectedTab: Int = 0 // Aktif tabı takip eden sınıf
+}
+
 struct MoviesTabView: View {
+    
+    @StateObject private var tabSelection = TabSelection()
+    
     var body: some View {
-        TabView {
-            Tab("Movies", systemImage: "movieclapper") {
-                MoviesView()
-            }
+        TabView(selection: $tabSelection.selectedTab) {
             
-            Tab("Series", systemImage: "camera") {
-                SeriesView()
-            }
+            MoviesView()
+                .tabItem {
+                    Label("Movies", systemImage: "movieclapper")
+                }
+                .tag(0)
             
-            Tab("Favorites", systemImage: "star") {
-                FavoritesView()
-            }
+            SeriesView()
+                .tabItem {
+                    Label("Series", systemImage: "camera")
+                }
+                .tag(1)
             
             
+            FavoritesView()
+                .tabItem {
+                    Label("Favorites", systemImage: "star")
+                }
+                .tag(2)
         }
+        .environmentObject(tabSelection)
+        
         .accentColor(Color("brandPrimary"))
         
     }

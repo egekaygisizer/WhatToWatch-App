@@ -10,6 +10,7 @@ import SwiftUI
 struct SeriesDetailView: View {
     let series: any Series
     @StateObject var viewModel = SeriesDetailViewModel()
+    @EnvironmentObject var favoriteSeries : FavoriteSeries
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -22,11 +23,31 @@ struct SeriesDetailView: View {
             }
             
             ScrollView {
+                
                 // Serie overview, rating, release date
                 SerieDescription(series: series)
                 
-                FavoriteButton()
-                    .padding()
+                HStack(alignment: .center) { // Series genres
+                    if let genre = viewModel.seriesDetail {
+                        Text("Series Genre:")
+                            .font(.title3)
+                            .fontWeight(.medium)
+                        ForEach(genre.genres.prefix(2)) { genres in
+                            Text("\(genres.name), ")
+                                .multilineTextAlignment(.center)
+                                .font(.body)
+                        }
+                    }
+                }
+                
+                FavoriteButton(isFavorite: favoriteSeries.isFavorite(series: series)) {
+                    if favoriteSeries.isFavorite(series: series) {
+                        favoriteSeries.removeFromFavorites(series: series)
+                    } else {
+                        favoriteSeries.addToFavorites(series: series)
+                    }
+                }
+                    .padding(.top, 50)
                 
                 
                 
@@ -45,8 +66,7 @@ struct SeriesDetailView: View {
                     
                 }
                 
-                
-            }
+            }.padding(3)
             
         }
         .onAppear {
