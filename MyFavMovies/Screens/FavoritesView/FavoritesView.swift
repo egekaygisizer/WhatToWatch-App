@@ -69,6 +69,7 @@ struct FavoritesView: View {
     FavoritesView()
         .environmentObject(TabSelection())
         .environmentObject(FavoriteMovies())
+        .environmentObject(FavoriteSeries())
 }
 
 struct MovieCell : View {

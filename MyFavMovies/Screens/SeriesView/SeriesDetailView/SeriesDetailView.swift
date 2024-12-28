@@ -10,74 +10,59 @@ import SwiftUI
 struct SeriesDetailView: View {
     let series: any Series
     @StateObject var viewModel = SeriesDetailViewModel()
-    @EnvironmentObject var favoriteSeries : FavoriteSeries
+    @EnvironmentObject var favoriteSeries: FavoriteSeries
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            ZStack(alignment: .center) {
-                // Blurry Background Image
-                SerieBlurBackground(series: series)
+        ScrollView(showsIndicators: false) {
+            VStack {
+                // Hero section
+                ZStack(alignment: .bottom) {
+                    // Backdrop
+                    SerieBlurBackground(series: series)
+                    
+                    // Series poster and title
+                    SerieImageTitle(series: series)
+                        .padding(17)
+                }
                 
-                // Serie image and title
-                SerieImageTitle(series: series)
-            }
-            
-            ScrollView {
-                
-                // Serie overview, rating, release date
-                SerieDescription(series: series)
-                
-                HStack(alignment: .center) { // Series genres
+                VStack(spacing: 15) {
+                    // Rating and favorite button
+                    HStack(spacing: 3) {
+                        SeriesRatingView(rating: series.vote_average, voteCount: series.vote_count)
+                        Spacer()
+                        FavoriteButton(isFavorite: favoriteSeries.isFavorite(series: series)) {
+                            if favoriteSeries.isFavorite(series: series) {
+                                favoriteSeries.removeFromFavorites(series: series)
+                            } else {
+                                favoriteSeries.addToFavorites(series: series)
+                            }
+                        }
+                    }
+                    .padding(.top, 16)
+                    
+                    // Series details
+                    SerieDescription(series: series)
+                    
+                    // Genres
                     if let genre = viewModel.seriesDetail {
-                        Text("Series Genre:")
-                            .font(.title3)
-                            .fontWeight(.medium)
-                        ForEach(genre.genres.prefix(2)) { genres in
-                            Text("\(genres.name), ")
-                                .multilineTextAlignment(.center)
-                                .font(.body)
-                        }
-                    }
-                }
-                
-                FavoriteButton(isFavorite: favoriteSeries.isFavorite(series: series)) {
-                    if favoriteSeries.isFavorite(series: series) {
-                        favoriteSeries.removeFromFavorites(series: series)
-                    } else {
-                        favoriteSeries.addToFavorites(series: series)
-                    }
-                }
-                    .padding(.top, 50)
-                
-                
-                
-                if let detailSeason = viewModel.seriesDetail {
-                    VStack(alignment: .leading) {
-                        Text("Seasons")
-                            .padding(.top, 10)
-                            .font(.title3)
-                            .fontWeight(.medium)
-                            .frame(width: UIScreen.main.bounds.width - 40)
-                        
-                        ForEach(detailSeason.seasons, id: \.id) { season in
-                            SeasonListCell(season: season)
-                        }
+                        GenresView(genres: genre.genres)
+                            .padding(.top, -4)
                     }
                     
+                    // Seasons
+                    if let detailSeason = viewModel.seriesDetail {
+                        SeasonsView(seasons: detailSeason.seasons)
+                            .padding(.bottom, 20)
+                    }
                 }
-                
-            }.padding(3)
-            
+                .padding(.horizontal)
+            }
         }
+        .ignoresSafeArea(edges: .top)
         .onAppear {
             viewModel.getSeriesDetail(seriesId: series.id)
         }
     }
-}
-    
-
-#Preview {
-    SeriesDetailView(series: MockData.sampleSeries as (any Series))
 }
 
 struct SerieBlurBackground: View {
@@ -86,15 +71,13 @@ struct SerieBlurBackground: View {
     var body: some View {
         AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(series.backdrop_path ?? "")")) { image in
             image.resizable()
-                .blur(radius: 25)
-                .ignoresSafeArea()
-                .frame(height: 370)
+                .frame(height: 300)
+                .blur(radius: 10)
         } placeholder: {
             Rectangle()
-                .foregroundColor(.gray)
-                .blur(radius: 25)
-                .ignoresSafeArea()
-                .frame(height: 370)
+                .foregroundColor(.gray.opacity(0.3))
+                .frame(height: 300)
+                .blur(radius: 10)
         }
     }
 }
@@ -103,29 +86,61 @@ struct SerieImageTitle: View {
     let series: any Series
     
     var body: some View {
-        VStack(spacing: 10) {
+        HStack(alignment: .bottom, spacing: 16) {
+            // Poster
             AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(series.poster_path ?? "")")) { image in
                 image.resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 180, height: 270)
+                    .frame(width: 100)
                     .cornerRadius(10)
+                    .shadow(radius: 6)
             } placeholder: {
-                Image(systemName: "photo.on.rectangle.angled")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 180, height: 270)
+                Rectangle()
+                    .foregroundColor(.gray.opacity(0.3))
+                    .frame(width: 100, height: 150)
                     .cornerRadius(10)
-                    .foregroundColor(.gray)
             }
             
-            Text(series.name)
-                .font(.title)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-                .foregroundColor(.white)
-                .shadow(radius: 5) // Başlığın okunabilirliği için gölge ekledim.
+            // Title and first air date
+            VStack(alignment: .leading, spacing: 6) {
+                Text(series.name)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .shadow(radius: 2)
+                    .lineLimit(3)
+                
+                Text(String(series.first_air_date.prefix(4)))
+                    .font(.footnote)
+                    .foregroundColor(.white.opacity(0.8))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(.horizontal)
+    }
+}
+
+struct SeriesRatingView: View {
+    let rating: Double
+    let voteCount: Int
+    
+    var body: some View {
+        VStack(spacing: 5) {
+            HStack(spacing: 4) {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.yellow)
+                Text(String(format: "%.1f", rating))
+                    .fontWeight(.semibold)
+            }
+            Text("\(voteCount) votes")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+        .cornerRadius(8)
     }
 }
 
@@ -134,71 +149,115 @@ struct SerieDescription: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(series.overview)
-                .font(.body)
-                .multilineTextAlignment(.leading)
-            
-            HStack(spacing: 8) {
-                Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                
-                HStack(alignment: .bottom) {
-                    Text("\(series.vote_average, specifier: "%.1f")")
-                        .font(.headline)
-                    Text("(\(series.vote_count))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 2)
-                }
-                
+            // Overview section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Overview")
+                    .font(.headline)
+                Text(series.overview)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
-            Text("Release Date: \(series.first_air_date)")
-                .font(.subheadline)
-                .foregroundColor(.gray)
+            // First air date
+            VStack(alignment: .leading, spacing: 6) {
+                Text("First Air Date")
+                    .font(.headline)
+                Text(series.first_air_date)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
         }
-        .padding()
     }
+}
+
+struct GenresView: View {
+    let genres: [SeriesDetailGenres]
     
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Genres")
+                .font(.headline)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(genres) { genre in
+                        Text(genre.name)
+                            .font(.caption)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(12)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct SeasonsView: View {
+    let seasons: [SeriesDetailSeasons]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Seasons")
+                .font(.headline)
+            
+            ForEach(seasons, id: \.id) { season in
+                SeasonListCell(season: season)
+            }
+        }
+    }
 }
 
 struct SeasonListCell: View {
     let season: SeriesDetailSeasons
     
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
+            // Season poster
             AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(season.poster_path)")) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 100)
+                image.resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 80, height: 120)
                     .cornerRadius(8)
             } placeholder: {
                 Rectangle()
-                    .frame(width: 100, height: 150)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.gray.opacity(0.3))
+                    .frame(width: 80, height: 120)
                     .cornerRadius(8)
             }
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(season.name)
-                    .font(.headline)
-                Text("Episodes: \(season.episode_count)")
                     .font(.subheadline)
+                    .fontWeight(.semibold)
+                
+                Text("\(season.episode_count) episodes")
+                    .font(.caption)
                     .foregroundColor(.secondary)
+                
+                if season.vote_average != 0 {
+                    HStack(spacing: 4) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                            .font(.caption2)
+                        Text(String(format: "%.1f", season.vote_average))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
-            
-            if season.vote_average != 0 {
-                HStack() {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    
-                    Text("\(season.vote_average, specifier: "%.1f")")
-                        .font(.headline)
-                    
-                }.padding(20)
-            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(8)
+        .padding(10)
+        .background(.ultraThinMaterial)
+        .cornerRadius(10)
     }
+}
+
+#Preview {
+    SeriesDetailView(series: MockData.sampleSeries as (any Series))
+        .environmentObject(FavoriteSeries())
 }
