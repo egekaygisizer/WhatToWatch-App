@@ -12,7 +12,7 @@ final class NetworkManager {
     static let shared = NetworkManager()
     private let cache = NSCache<NSString, UIImage>()
     
-    static let apiKey = "26057c9600d599f192bf24c0aea444a2"
+    static let apiKey = "YOUR_API_KEY"
     private let baseURL = "https://api.themoviedb.org/3"
     
     
